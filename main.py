@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import json
-
+import mysql.connector
 
 urls = open("urls.txt", "r").read().split("\n")
 
@@ -36,7 +36,7 @@ def main():
 
         detail_drug = {}
         for index in range(len(detail_titles)):
-            detail_drug[detail_titles[index].text.lower().replace(".", "").replace(" ", "-")] = "-" if drug_details[index].find('div').text == "" else drug_details[index].find('div').text.replace("\n", "").replace(" ", "")
+            detail_drug[detail_titles[index].text.lower().replace(".", "").replace(" ", "-")] = "-" if drug_details[index].find('div').text == "" else drug_details[index].find('div').text.replace("\n", "")
            
 
         
@@ -48,10 +48,38 @@ def main():
         })
        
 
+    # Todo SQL
+    ctx = mysql.connector.connect(user='root', password='',
+                              host='localhost',
+                              database='drug_capstone')
+
+    insert_query = "INSERT IGNORE INTO drugs (title,image,product_url,description, indication, compotition, dose, how_to_use, attention, indication_contra, side_effect, product_class, package, manufactur, bpom) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    cursor = ctx.cursor()
+
+
+    # cursor.execute("truncate drugs")
+
+
+    batch_size=5
+    for i in range(0, len(drugs), batch_size):
+        batch = drugs[i:i+batch_size]
+        values = [(row.get("title", None),row.get("image", None), row.get("product_url", None),row["detail"].get('deskripsi', None), row["detail"].get('indikasi-umum', None), row["detail"].get('komposisi', None), row["detail"].get('dosis', None), row["detail"].get('aturan-pakai', None), row["detail"].get('perhatian', None), row["detail"].get('kontra-indikasi', None), row["detail"].get('efek-samping', None), row["detail"].get('golongan-produk', None), row["detail"].get('kemasan', None), row["detail"].get('manufaktur', None), row["detail"].get('no-registrasi', None)) for row in batch]
+
+        cursor.executemany(insert_query, values)
+
+
+    ctx.commit()
+
+    # Close the cursor and connection
+    cursor.close()
+    ctx.close()    
+
 
     print(f"execution time: {(time.time() - start_time)}" )
     time.sleep(1)
-    json_data = json.dumps({"drugs" : drugs}, indent=4,ensure_ascii=True)
+
+    # ToDo SQL
+    json_data = json.dumps({"total_data" : len(drugs), "drugs" : drugs}, indent=4,ensure_ascii=True)
     
 
     with open("drugs.json", 'w') as json_file:
