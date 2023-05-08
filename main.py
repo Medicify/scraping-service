@@ -1,6 +1,8 @@
 import requests 
 from bs4 import BeautifulSoup
 import time
+import json
+
 
 urls = open("urls.txt", "r").read().split("\n")
 
@@ -16,10 +18,7 @@ def main():
     for url in urls:
         result = requests.get(url)
         soup = BeautifulSoup(result.text, "html.parser")
-        # titles = soup.find_all("div", class_="ngx-ellipsis-inner")
         li_elements =soup.find_all("li", class_="custom-container__list__container__item")
-        # detail_product = li_elements[0].find("a", class_="custom-container__list__container__item--link")
-
         for li_element in li_elements:
             detail_product = li_element.find("a", class_="custom-container__list__container__item--link")
             detail_products.append(detail_product['href'])
@@ -42,8 +41,9 @@ def main():
 
         
         drugs.append({
-            "image" : images["src"], 
-            "title" : titles.text,
+            "product_url" : BASE_URL + detail,
+            "image" : "-" if images is None else images["src"] , 
+            "title" : "-" if titles is None else titles.text,
             "detail" : detail_drug
         })
        
@@ -51,6 +51,14 @@ def main():
 
     print(f"execution time: {(time.time() - start_time)}" )
     time.sleep(1)
+    json_data = json.dumps({"drugs" : drugs}, indent=4,ensure_ascii=True)
+    
+
+    with open("drugs.json", 'w') as json_file:
+        json_file.write(json_data)
+
+
+
     print(f'total data scrape: {len(drugs)}')
 
 if __name__ == "__main__":
