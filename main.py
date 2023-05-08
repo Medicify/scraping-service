@@ -36,7 +36,7 @@ def main():
 
         detail_drug = {}
         for index in range(len(detail_titles)):
-            detail_drug[detail_titles[index].text.lower()] = "-" if drug_details[index].find('div').text == "" else drug_details[index].find('div').text.replace("\n", "")
+            detail_drug[detail_titles[index].text.lower().replace(".", "").replace(" ", "-")] = "-" if drug_details[index].find('div').text == "" else drug_details[index].find('div').text.replace("\n", "").replace(" ", "")
            
 
         
