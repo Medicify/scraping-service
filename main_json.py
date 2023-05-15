@@ -2,26 +2,17 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import json
-import mysql.connector
 
 urls = open("urls.txt", "r").read().split("\n")
 
 BASE_URL = "https://www.halodoc.com/obat-dan-vitamin"
-
 detail_products = []
+drugs = []
 
 
 def main():
     print("scraping....")
-    insert_query = "INSERT IGNORE INTO drugs (title,image,product_url,description, indication, compotition, dose, how_to_use, attention, indication_contra, side_effect, product_class, package, manufactur, bpom) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    ctx = mysql.connector.connect(user='root', password='',
-                              host='localhost',
-                              database='drug_capstone')
-
-    cursor = ctx.cursor()
-
     start_time = time.time()
-
     for url in urls:
         result = requests.get(url)
         soup = BeautifulSoup(result.text, "html.parser")
@@ -29,7 +20,6 @@ def main():
         for li_element in li_elements:
             detail_product = li_element.find("a", class_="custom-container__list__container__item--link")
             detail_products.append(detail_product['href'])
-
 
     for detail in detail_products:
         get_detail_products = requests.get(BASE_URL + detail)
@@ -45,16 +35,30 @@ def main():
         for index in range(len(detail_titles)):
             detail_drug[detail_titles[index].text.lower().replace(".", "").replace(" ", "-")] = "-" if drug_details[index].find('div').text == "" else drug_details[index].find('div').text.replace("\n", "")
            
+        drugs.append({
+                "product_url" : BASE_URL + detail,
+                "image" : "-" if images is None else images["src"] , 
+                "title" : "-" if titles is None else titles.text,
+                "deskripsi": detail_drug.get('deskripsi', None),
+                "indikasi-umum": detail_drug.get('indikasi-umum', None),
+                "komposisi": detail_drug.get('komposisi', None),
+                "dosis":  detail_drug.get('dosis', None),
+                "aturan-pakai": detail_drug.get('aturan-pakai', None),
+                "perhatian":  detail_drug.get('perhatian', None),
+                "kontra-indikasi": detail_drug.get('kontra-indikasi', None),
+                "efek-samping": detail_drug.get('efek-samping', None),
+                "golongan-produk": detail_drug.get('golongan-produk', None),
+                "kemasan": detail_drug.get('kemasan', None),
+                "manufaktur": detail_drug.get('manufaktur', None),
+                "no-registrasi": detail_drug.get('no-registrasi', None)
+            })
 
-        values = ["-" if titles is None else titles.text, "-" if images is None else images["src"], BASE_URL + detail ,detail_drug.get('deskripsi', None), detail_drug.get('indikasi-umum', None), detail_drug.get('komposisi', None), detail_drug.get('dosis', None), detail_drug.get('aturan-pakai', None), detail_drug.get('perhatian', None), detail_drug.get('kontra-indikasi', None), detail_drug.get('efek-samping', None), detail_drug.get('golongan-produk', None), detail_drug.get('kemasan', None), detail_drug.get('manufaktur', None), detail_drug.get('no-registrasi', None)]
-
-        cursor.execute(insert_query, values)
 
 
-    ctx.commit()
-    cursor.close()
-    ctx.close()    
 
+    json_data = json.dumps(drugs, indent=4,ensure_ascii=True)
+    with open("drugs.json", 'w') as json_file:
+        json_file.write(json_data)
 
     print(f"execution time: {(time.time() - start_time)}" )
     time.sleep(1)
