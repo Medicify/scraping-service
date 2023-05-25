@@ -20,7 +20,7 @@ detail_products = []
 
 def main():
     print("scraping....")
-    insert_query = "INSERT IGNORE INTO drugs (title,image,product_url,description, indication, compotition, dose, how_to_use, attention, indication_contra, side_effect, product_class, package, manufactur, bpom) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    insert_query = "INSERT IGNORE INTO drugs (title,image,type,product_url,description, indication, compotition, dose, how_to_use, attention, indication_contra, side_effect, product_class, package, manufactur, bpom) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     ctx = mysql.connector.connect(user=DB_USER, password=DB_PASSWORD,
                               host=DB_HOST,
                               database=DB_DATABASE)
@@ -55,9 +55,9 @@ def main():
             detail_drug[detail_titles[index].text.lower().replace(".", "").replace(" ", "-")] = "-" if drug_details[index].find('div').text == "" else drug_details[index].find('div').text.replace("\n", "")
            
     
-        # values = ["-" if titles is None else titles.text, "-" if images is None else images["src"], BASE_URL + detail ,detail_drug.get('deskripsi', None), detail_drug.get('indikasi-umum', None), detail_drug.get('komposisi', None), detail_drug.get('dosis', None), detail_drug.get('aturan-pakai', None), detail_drug.get('perhatian', None), detail_drug.get('kontra-indikasi', None), detail_drug.get('efek-samping', None), detail_drug.get('golongan-produk', None), detail_drug.get('kemasan', None), detail_drug.get('manufaktur', None), detail_drug.get('no-registrasi', None)]
+        values = ["-" if titles is None else titles.text, "-" if images is None else images["src"], "-" if drug_type is None else drug_type.text.split(" ")[2],  BASE_URL + detail ,detail_drug.get('deskripsi', None), detail_drug.get('indikasi-umum', None), detail_drug.get('komposisi', None), detail_drug.get('dosis', None), detail_drug.get('aturan-pakai', None), detail_drug.get('perhatian', None), detail_drug.get('kontra-indikasi', None), detail_drug.get('efek-samping', None), detail_drug.get('golongan-produk', None), detail_drug.get('kemasan', None), detail_drug.get('manufaktur', None), detail_drug.get('no-registrasi', None)]
 
-        # cursor.execute(insert_query, values)
+        cursor.execute(insert_query, values)
 
 
     ctx.commit()

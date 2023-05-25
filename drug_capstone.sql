@@ -31,6 +31,7 @@ CREATE TABLE `drugs` (
   `id` varchar(32) DEFAULT uuid() PRIMARY KEY,
   `image` varchar(255) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
+  `type` varchar(255) DEFAULT NULL,
   `product_url` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `indication` text DEFAULT NULL,
