@@ -2,10 +2,15 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import json
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 urls = open("urls.txt", "r").read().split("\n")
 
-BASE_URL = "https://www.halodoc.com/obat-dan-vitamin"
+BASE_URL = os.environ.get("BASE_URL")
+
 detail_products = []
 drugs = []
 
