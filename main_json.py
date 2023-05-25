@@ -34,7 +34,7 @@ def main():
         titles = bs.find("h1",class_="product-label")
         drug_details = bs.find_all("div", class_="drug-detail")
         detail_titles = bs.find_all("div", class_="ttl-list")
-
+        drug_type = bs.find("div", class_="microcopy-product-detail")
 
         detail_drug = {}
         for index in range(len(detail_titles)):
@@ -44,6 +44,7 @@ def main():
                 "product_url" : BASE_URL + detail,
                 "image" : "-" if images is None else images["src"] , 
                 "title" : "-" if titles is None else titles.text,
+                "type" : "-" if drug_type is None else drug_type.text.split(" ")[2],
                 "deskripsi": detail_drug.get('deskripsi', None),
                 "indikasi-umum": detail_drug.get('indikasi-umum', None),
                 "komposisi": detail_drug.get('komposisi', None),
@@ -60,7 +61,7 @@ def main():
 
 
 
-
+    print(drugs)
     json_data = json.dumps(drugs, indent=4,ensure_ascii=True)
     with open("drugs.json", 'w') as json_file:
         json_file.write(json_data)
