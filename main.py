@@ -5,11 +5,8 @@ import json
 import mysql.connector
 import os
 import re
-from dotenv import load_dotenv
 
-load_dotenv()
 urls = open("urls.txt", "r").read().split("\n")
-
 BASE_URL = os.environ.get("BASE_URL")
 DB_HOST = os.environ.get("DB_HOST")
 DB_USER = os.environ.get("DB_USER")
@@ -19,7 +16,7 @@ DB_DATABASE = os.environ.get("DB_DATABASE")
 detail_products = []
 
 
-def main():
+def main(request):
     print("scraping....")
     insert_query = "INSERT IGNORE INTO drugs (title,image,type,product_url,description, indication, compotition, dose, how_to_use, attention, indication_contra, side_effect, product_class, package, manufactur, bpom) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     ctx = mysql.connector.connect(user=DB_USER, password=DB_PASSWORD,
@@ -70,9 +67,6 @@ def main():
     time.sleep(1)
    
 
-    return "done"
-
-if __name__ == "__main__":
-    main()
+    return "success", 200
 
     

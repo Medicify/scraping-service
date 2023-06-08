@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `drugs` (
-  `id` varchar(32) DEFAULT uuid() PRIMARY KEY,
+  `id` varchar(32) DEFAULT(UUID()) PRIMARY KEY,
   `image` varchar(255) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `type` varchar(255) DEFAULT NULL,
