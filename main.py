@@ -16,7 +16,7 @@ DB_DATABASE = os.environ.get("DB_DATABASE")
 detail_products = []
 
 
-def main(request):
+def main():
     print("scraping....")
     insert_query = "INSERT IGNORE INTO drugs (title,image,type,product_url,description, indication, compotition, dose, how_to_use, attention, indication_contra, side_effect, product_class, package, manufactur, bpom) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     ctx = mysql.connector.connect(user=DB_USER, password=DB_PASSWORD,
@@ -69,4 +69,5 @@ def main(request):
 
     return "success", 200
 
-    
+if __name__=="__main__":
+    main()
