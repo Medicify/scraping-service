@@ -55,6 +55,18 @@ source venv/bin/activate
 
 ```
 
+### deploy to cloud function
+
+```bash
+ADD: def main(request): #like this, because cloud function need to pass request argument to entry point function
+
+REMOVE:
+if __name__=="__main__":
+    main()
+# cloud function has own runtime
+
+```
+
 ## Documentation
 
 [Documentation](https://www.python.org/doc/)
